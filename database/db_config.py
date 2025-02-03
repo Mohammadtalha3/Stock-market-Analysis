@@ -3,7 +3,7 @@ import psycopg2
 class Connection:
     def __init__(self):
         self.host = 'localhost'
-        self.database = 'stock_marketdb'
+        self.database = 'stock_market'
         self.user = 'postgres'
         self.password = '12345'
         self.connection = None  # Initialize connection as None

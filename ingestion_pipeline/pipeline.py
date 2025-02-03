@@ -3,6 +3,8 @@ import numpy as np
 import os
 import dotenv
 import requests
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database.db_config import Connection
 from database.db_queries import Daily_stock_fetch, Intra_day_stock_fetch, daily_hypertable, intraday_hypertable
 import json
@@ -12,8 +14,6 @@ db= Connection()
 # Load environment variables
 dotenv.load_dotenv()
 
-API_KEY = os.getenv("Daily_Data")
-print('this is api key ', API_KEY)
 
 
 def load_daily_Data():
@@ -54,7 +54,7 @@ def load_daily_Data():
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     df.to_csv("daily_stock_data.csv", index=False)
     db.connect()
-    query= """ INSERT INTO daily_stock_data (stock_symbol,timestamp, open, high, low, close, volume) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+    query= """ INSERT INTO stock_prices_daily (stock_symbol,timestamp, open, high, low, close, volume) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
     for index, row in df.iterrows():
         try:
             timestamp=row["timestamp"]
@@ -110,15 +110,15 @@ def load_intraday_Data():
             db.execute(query, (stock_symbol,timestamp, open, high, low, close, volume))
         except Exception as e:
             print(f"❌ Error inserting row {row['timestamp']}: {e}")
-            db.rollback()
+            # db.rollback()
         print(timestamp, open, high, low, close, volume)
 
 
 
 
-dtt=load_intraday_Data()
-
-print(dtt)
+# dtt=load_intraday_Data()
+dyy= load_daily_Data()
+print(dyy)
 
 
 
