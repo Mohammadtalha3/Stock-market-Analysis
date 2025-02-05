@@ -32,11 +32,11 @@ class Connection:
         if self.connection:
             self.connection.commit()
 
-    def execute(self, query, params):
+    def execute(self, query, params=None):
         if not self.connection:
             raise Exception("⚠️ Database connection is not established. Call `connect()` first.")
         try:
-            self.cursor.execute(query, params)
+            self.cursor.execute(query)
             self.commit()
         except Exception as e:
             print(f"❌ Error executing query: {e}")
