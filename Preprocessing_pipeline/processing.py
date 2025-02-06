@@ -1,5 +1,4 @@
 # from database.db_config import Connection
-
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

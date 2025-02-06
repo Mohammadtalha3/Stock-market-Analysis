@@ -46,10 +46,6 @@ def load_daily_Data():
             print(f"Skipping malformed entry for {date}: {values} - Error: {e}")
     
 
-
-
-
-
     df = pd.DataFrame(records, columns=["stock_symbol", "timestamp", "open", "high", "low", "close", "volume"])
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     df.to_csv("daily_stock_data.csv", index=False)
@@ -115,10 +111,6 @@ def load_intraday_Data():
 
 
 
-
-# dtt=load_intraday_Data()
-dyy= load_daily_Data()
-print(dyy)
 
 
 

@@ -26,11 +26,13 @@ def features():
                 d.stock_symbol,
                 d.timestamp,
                 d.close,
+                d.high,
+                d.low,
                 d.volume,
                 d.ma_5,
                 d.ma_10,
                 d.ma_50,
-                d.daily_return,
+                d.daily_return, 
                 d.intraday_volatility,
                 prev_day.prev_day_close,
                 prev_day.prev_day_return,
@@ -52,9 +54,6 @@ def features():
 
 
 ff= features()
-
 data= db.fetch(ff)
-
 df= pd.DataFrame(data)
-
 print(df)

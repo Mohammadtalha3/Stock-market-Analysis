@@ -6,3 +6,5 @@ requests
 psycopg2
 sqlalchemy
 scikit-learn
+uvicorn
+fastapi
