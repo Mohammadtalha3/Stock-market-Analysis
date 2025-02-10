@@ -11,6 +11,7 @@ import json
 
 db= Connection()
 
+
 # Load environment variables
 dotenv.load_dotenv()
 
@@ -48,7 +49,7 @@ def load_daily_Data():
 
     df = pd.DataFrame(records, columns=["stock_symbol", "timestamp", "open", "high", "low", "close", "volume"])
     df["timestamp"] = pd.to_datetime(df["timestamp"])
-    df.to_csv("daily_stock_data.csv", index=False)
+    df.to_csv("daily_stock_data_automated.csv", index=False)
     db.connect()
     query= """ INSERT INTO stock_prices_daily (stock_symbol,timestamp, open, high, low, close, volume) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
     for index, row in df.iterrows():
@@ -92,22 +93,22 @@ def load_intraday_Data():
     
     df = pd.DataFrame(records, columns=["stock_symbol", "timestamp", "open", "high", "low", "close", "volume"])
     df["timestamp"] = pd.to_datetime(df["timestamp"])
-    df.to_csv("intraday_stock_data.csv", index=False)
+    df.to_csv("intraday_stock_data-automated.csv", index=False)
     db.connect()
     query= """ INSERT INTO stock_prices_intraday (stock_symbol,timestamp, open, high, low, close, volume) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
     for index, row in df.iterrows():
         try:
             timestamp=row["timestamp"]
-            open = row['open']
-            high = row['high']
-            low = row['low']
-            close = row['close']
+            open_price  = row['open']
+            high_price  = row['high']
+            low_price = row['low']
+            close_price = row['close']
             volume = row['volume']
-            db.execute(query, (stock_symbol,timestamp, open, high, low, close, volume))
+            db.execute(query, (stock_symbol,timestamp, open_price , high_price, low_price, close_price, volume))
         except Exception as e:
             print(f"❌ Error inserting row {row['timestamp']}: {e}")
             # db.rollback()
-        print(timestamp, open, high, low, close, volume)
+        print(timestamp, open_price, high_price, low_price, close_price, volume)
 
 
 

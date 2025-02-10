@@ -8,3 +8,5 @@ sqlalchemy
 scikit-learn
 uvicorn
 fastapi
+celery 
+celerybeat-redis
