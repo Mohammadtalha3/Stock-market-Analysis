@@ -19,13 +19,15 @@ dotenv.load_dotenv()
 
 def load_daily_Data():
     API_KEY = os.getenv("Daily_Data")
-    url= f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&outputsize=full&apikey={API_KEY}'
+    url= f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey={API_KEY}'
     response = requests.get(url)
     if response.status_code != 200:
         raise Exception(f"API request failed with status code {response.status_code}")
     data = response.json()
 
     stock_symbol = 'IBM'
+
+    print('this is the daily data ',data)
 
 
     # for date, values in data['Meta Data'].items():
@@ -42,6 +44,8 @@ def load_daily_Data():
             low_price = float(values["3. low"])
             close_price = float(values["4. close"])
             volume = int(values["5. volume"])
+
+
             records.append([stock_symbol,date, open_price, high_price, low_price, close_price, volume])
         except (KeyError, ValueError, TypeError) as e:
             print(f"Skipping malformed entry for {date}: {values} - Error: {e}")
@@ -49,9 +53,16 @@ def load_daily_Data():
 
     df = pd.DataFrame(records, columns=["stock_symbol", "timestamp", "open", "high", "low", "close", "volume"])
     df["timestamp"] = pd.to_datetime(df["timestamp"])
+    df.sort_values('timestamp', inplace=True)
+
+    df['ma_5']= df['close'].rolling(window=5).mean()
+    df['ma_10']= df['close'].rolling(window=10).mean()
+    df['ma_50']= df['close'].rolling(window=50).mean()
+    df['daily_return']=  df['close'].pct_change()
+
     df.to_csv("daily_stock_data_automated.csv", index=False)
     db.connect()
-    query= """ INSERT INTO stock_prices_daily (stock_symbol,timestamp, open, high, low, close, volume) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+    query= """ INSERT INTO stock_prices_daily (stock_symbol,timestamp, open, high, low, close, volume, ma_5,ma_10,ma_50,daily_return) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
     for index, row in df.iterrows():
         try:
             timestamp=row["timestamp"]
@@ -60,11 +71,15 @@ def load_daily_Data():
             low = row['low']
             close = row['close']
             volume = row['volume']
-            db.execute(query, (stock_symbol,timestamp, open, high, low, close, volume))
+            ma_5= row['ma_5']
+            ma_10= row['ma_10']
+            ma_50= row['ma_50']
+            daily_return = row['daily_return']
+            db.execute(query, (stock_symbol,timestamp, open, high, low, close, volume, ma_5,ma_10,ma_50,daily_return))
         except Exception as e:
             print(f"❌ Error inserting row {row['timestamp']}: {e}")
             db.rollback()
-        print(timestamp, open, high, low, close, volume)
+        print(timestamp, open, high, low, close, volume,ma_5,ma_10,ma_50,daily_return)
     
     return df
 

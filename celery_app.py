@@ -11,9 +11,11 @@ celery.conf.beat_schedule = {
     },
     "fetch-and-process-daily-data": {
         "task": "celery_worker.fetch_and_process_daily_data",  # Fix Task Name
-        "schedule": crontab(minute="*/5"),  # Every day at 9 AM
+        "schedule": crontab(minute="*/5") #day at 9 AM
     },
 }
  
 celery.conf.timezone = "UTC"
 # celery.autodiscover_tasks(['celery_worker'])
+
+
