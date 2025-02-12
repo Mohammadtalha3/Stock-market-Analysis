@@ -40,6 +40,7 @@ class Connection:
             self.cursor.execute(query,params)
             self.commit()
         except Exception as e:
+            self.connection.rollback()
             print(f"❌ Error executing query: {e}")
 
     def fetch(self, query):

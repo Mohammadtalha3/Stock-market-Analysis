@@ -60,7 +60,7 @@ def load_daily_Data():
     df['ma_50']= df['close'].rolling(window=50).mean()
     df['daily_return']=  df['close'].pct_change()
 
-    df.to_csv("daily_stock_data_automated.csv", index=False)
+    # df.to_csv("daily_stock_data_automated_2.csv", index=False)
     db.connect()
     query= """ INSERT INTO stock_prices_daily (stock_symbol,timestamp, open, high, low, close, volume, ma_5,ma_10,ma_50,daily_return) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
     for index, row in df.iterrows():
@@ -102,12 +102,15 @@ def load_intraday_Data():
             low_price = float(values["3. low"])
             close_price = float(values["4. close"])
             volume = int(values["5. volume"])
+            
+
             records.append([stock_symbol,date, open_price, high_price, low_price, close_price, volume])
         except (KeyError, ValueError, TypeError) as e:
             print(f"Skipping malformed entry for {date}: {values} - Error: {e}")
     
     df = pd.DataFrame(records, columns=["stock_symbol", "timestamp", "open", "high", "low", "close", "volume"])
     df["timestamp"] = pd.to_datetime(df["timestamp"])
+    
     df.to_csv("intraday_stock_data-automated.csv", index=False)
     db.connect()
     query= """ INSERT INTO stock_prices_intraday (stock_symbol,timestamp, open, high, low, close, volume) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
@@ -119,6 +122,7 @@ def load_intraday_Data():
             low_price = row['low']
             close_price = row['close']
             volume = row['volume']
+
             db.execute(query, (stock_symbol,timestamp, open_price , high_price, low_price, close_price, volume))
         except Exception as e:
             print(f"❌ Error inserting row {row['timestamp']}: {e}")
