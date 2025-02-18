@@ -63,6 +63,7 @@ def load_daily_Data():
     # df.to_csv("daily_stock_data_automated_2.csv", index=False)
     db.connect()
     query= """ INSERT INTO stock_prices_daily (stock_symbol,timestamp, open, high, low, close, volume, ma_5,ma_10,ma_50,daily_return) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+
     for index, row in df.iterrows():
         try:
             timestamp=row["timestamp"]
@@ -78,8 +79,31 @@ def load_daily_Data():
             db.execute(query, (stock_symbol,timestamp, open, high, low, close, volume, ma_5,ma_10,ma_50,daily_return))
         except Exception as e:
             print(f"❌ Error inserting row {row['timestamp']}: {e}")
-            db.rollback()
-        print(timestamp, open, high, low, close, volume,ma_5,ma_10,ma_50,daily_return)
+            # db.rollback()
+    
+    update_query = """
+        UPDATE stock_prices_daily spd
+        SET avg_closing_intraday = ia.avg_closing_intraday,
+            intraday_volatility = ia.intraday_volatility
+        FROM (
+            SELECT stock_symbol, DATE(timestamp) AS date, 
+                   AVG(close) AS avg_closing_intraday, 
+                   STDDEV(close) AS intraday_volatility
+            FROM stock_prices_intraday
+            GROUP BY stock_symbol, DATE(timestamp)
+        ) ia
+        WHERE spd.stock_symbol = ia.stock_symbol 
+        AND spd.timestamp::date = ia.date;
+    """
+
+    try:
+        db.execute(update_query, params=())
+        print("✅ Daily stock data successfully updated with intraday metrics!")
+    except Exception as e:
+        print(f"❌ Error updating daily stock data: {e}")
+        # db.rollback()
+
+
     
     return df
 
@@ -133,8 +157,7 @@ def load_intraday_Data():
 
 
 
-
-
+load_daily_Data()
 
 
 

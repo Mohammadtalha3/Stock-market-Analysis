@@ -1,0 +1,2 @@
+,stock_symbol,timestamp,close,high,low,volume,ma_5,ma_10,ma_50,daily_return,intraday_volatility,prev_day_close,prev_day_return,price_diff,target
+0,IBM,2025-02-14 00:00:00+05:00,261.28,261.94,257.91,3925277,256.05,257.452,233.0018,0.008063582699949778,0.5514622892269144,261.28,0.008063582699949778,0.0,1
