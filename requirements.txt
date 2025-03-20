@@ -3,10 +3,11 @@ numpy
 matplotlib
 python-dotenv
 requests
-psycopg2
+psycopg2-binary
 sqlalchemy
 scikit-learn
 uvicorn
 fastapi
 celery 
 celerybeat-redis
+streamlit

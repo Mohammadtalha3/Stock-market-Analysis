@@ -62,36 +62,32 @@ class Inference:
         return df[numerical_features]
 
 
-    def make_prediction(self):
-    # Preprocess the DataFrame
-        model_path="D:\Stock-market-Analysis\Experiment\logistic_regression_model.pkl"
-        df_preprocessed = self.preprocessing()
+    # def make_prediction(self):
+    # # Preprocess the DataFrame
+    #     model_path="D:\Stock-market-Analysis\Experiment\logistic_regression_model.pkl"
+    #     df_preprocessed = self.preprocessing()
 
-        # Get the latest row (most recent data)
-        latest_row = df_preprocessed.iloc[-1:]
+    #     # Get the latest row (most recent data)
+    #     latest_row = df_preprocessed.iloc[-1:]
 
-        # Load the trained model
-        model = joblib.load(model_path)
+    #     # Load the trained model
+    #     model = joblib.load(model_path)
 
-        # Make a prediction on the latest row
-        prediction = model.predict(latest_row)
+    #     # Make a prediction on the latest row
+    #     prediction = model.predict(latest_row)
 
-        # Return or print the prediction
-        print(f"Prediction for the latest data: {prediction}")
+    #     # Return or print the prediction
+    #     print(f"Prediction for the latest data: {prediction}")
 
-        return prediction
+    #     return prediction
     
 
     
-    # Output result
+    # # Output result
 
 
 
-dv= Inference()
-gg=dv.preprocessing()
-pp=dv.make_prediction()
 
-print(pp)
 
 
 

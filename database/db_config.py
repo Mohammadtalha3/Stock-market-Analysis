@@ -1,55 +1,46 @@
+import os
 import psycopg2
+from psycopg2 import sql
+from contextlib import contextmanager
 
 class Connection:
     def __init__(self):
-        self.host = 'localhost'
-        self.database = 'stock_marketdb'
-        self.user = 'postgres'
-        self.password = '12345'
-        self.connection = None  # Initialize connection as None
-        self.cursor = None  # Initialize cursor as None
+        self.host = os.getenv("DB_HOST", "db")
+        self.database = os.getenv("DB_NAME", "stock_marketdb")
+        self.user = os.getenv("DB_USER", "postgres")
+        self.password = os.getenv("DB_PASSWORD", "12345")
+        self.port = os.getenv("DB_PORT", "5433")
 
+    @contextmanager
     def connect(self):
+        """Context manager for database connection handling"""
+        conn = None
         try:
-            self.connection = psycopg2.connect(
+            conn = psycopg2.connect(
                 host=self.host,
                 database=self.database,
                 user=self.user,
                 password=self.password
             )
-            self.cursor = self.connection.cursor()
-            print("✅ Connected to the database")
+            cursor = conn.cursor()
+            yield cursor
+            conn.commit()  # Commit if no error
         except Exception as e:
-            print(f"❌ Failed to connect to the database: {e}")
+            if conn:
+                conn.rollback()  # Rollback in case of error
+            print(f"❌ Database error: {e}")
+        finally:
+            if conn:
+                cursor.close()
+                conn.close()
 
-    def close(self):
-        if self.connection:
-            self.cursor.close()
-            self.connection.close()
-            print("🔒 Database connection closed.")
+    def execute(self, query, params=()):
+        """Execute INSERT, UPDATE, DELETE queries"""
+        with self.connect() as cursor:
+            cursor.execute(query, params)
 
-    def commit(self):
-        if self.connection:
-            self.connection.commit()
-
-    def execute(self, query, params):
-        if not self.connection:
-            raise Exception("⚠️ Database connection is not established. Call `connect()` first.")
-        try:
-            # self.connect()
-            self.cursor.execute(query,params)
-            self.commit()
-        except Exception as e:
-            self.connection.rollback()
-            print(f"❌ Error executing query: {e}")
-
-    def fetch(self, query):
-        if not self.connection:
-            raise Exception("⚠️ Database connection is not established. Call `connect()` first.")
-        try:
-            self.cursor.execute(query)
-            return self.cursor.fetchall()
-        except Exception as e:
-            print(f"❌ Error fetching data: {e}")
-            return None
-
+    def fetch(self, query, params=()):
+        """Fetch SELECT queries"""
+        with self.connect() as cursor:
+            cursor.execute(query, params)
+            return cursor.fetchall()

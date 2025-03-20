@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: timescale/timescaledb:2.11.2-pg15
+    container_name: timescaledb
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: stock_marketdb
+    volumes:
+      - stock-market-analysis_stock-market-analysis_timescale_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+  
+  app:
+    build: .
+    container_name: stock-market-app
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env  # Load environment variables
+    volumes:
+      - .:/app
+
+volumes:
+    stock-market-analysis_stock-market-analysis_timescale_data:  
